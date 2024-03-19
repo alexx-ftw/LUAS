@@ -26,7 +26,7 @@ Last_medic_call_time = 0
 Last_spy_call_time = 0
 Overall_last_call_time = 0
 -- Make a call once every second
-local function onCreateMove(cmd)
+local function onCreateMove()
     local call_made = false
     -- Get the local player
     local Me = entities.GetLocalPlayer()
@@ -38,7 +38,7 @@ local function onCreateMove(cmd)
 
     -- Loop through all the players
     time_between_calls = 12
-    spy_distance = 800
+    local spy_distance = 800
     for _, player in pairs(players) do
         -- Check if the player is an enemy spy and is near.
         -- Make spy call only once every "time_between_calls" seconds
