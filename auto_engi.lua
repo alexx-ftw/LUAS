@@ -5,7 +5,7 @@ config = {
     scriptName = "Engineer Auto-Fix Buildings",
     verbose = false
 }
-print("Loading " .. config.scriptName.. "...")
+print("Loading " .. config.scriptName .. "...")
 print("Verbose: " .. tostring(config.verbose))
 
 -- Load the required libraries and throw an error if they are not found and exit the script
@@ -80,19 +80,14 @@ local function repairBuilding(cmd, building)
 end
 
 local function onCreateMove(cmd)
-    -- -- Run every 10 ticks
-    -- local ticks = globals.TickCount()
-    -- if ticks % 10 ~= 0 then
-    --     return
-    -- end
     Me = entities.GetLocalPlayer()
 
     if Me then
         -- Check if the player is an engineer
-        -- if Me:GetModel() ~= "CTFPlayerEngineer" then
-        --      print("You are not an engineer. You are a " .. Me:GetModel())
-        --      return
-        -- end
+        if alex_lib.get_player_class(Me) == alex_lib.TF2_CLASSES.ENGINEER then
+            print("You are not an engineer. You are a " .. alex_lib.get_player_class(Me))
+            return
+        end
         Buildings = {}
         -- Get all sentryguns
         local sentryguns = getSentryguns()

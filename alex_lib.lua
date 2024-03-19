@@ -46,11 +46,16 @@ local function getPlayers()
     return players
 end
 
+local function get_player_class(player)
+    return player:GetPropInt("m_iClass")
+end
+
 -- Return the library
 return {
     TF2_CLASSES = TF2_CLASSES,
     distance = distance,
     positionAngles = positionAngles,
     printifv = printifv,
-    getPlayers = getPlayers
+    getPlayers = getPlayers,
+    get_player_class = get_player_class
 }
