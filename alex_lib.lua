@@ -46,6 +46,9 @@ local function getPlayers()
     return players
 end
 
+---Get the class of a player
+---@param player Entity
+---@return integer
 local function get_player_class(player)
     return player:GetPropInt("m_iClass")
 end

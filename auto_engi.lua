@@ -9,7 +9,8 @@ print("Loading " .. config.scriptName .. "...")
 print("Verbose: " .. tostring(config.verbose))
 
 -- Load the required libraries and throw an error if they are not found and exit the script
-local alex_lib = require("LUAS\\alex_lib")
+local localappdata = os.getenv("LOCALAPPDATA")
+local alex_lib = require(localappdata .. "\\LUAS\\alex_lib")
 if not alex_lib then
     error("alex_lib not found")
 end
