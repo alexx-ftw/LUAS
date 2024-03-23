@@ -86,8 +86,13 @@ local function onCreateMove(cmd)
     -- Get the local player
     Me = entities.GetLocalPlayer()
 
-    -- Check if the player is valid and is alive and if right click is not pressed
-    if Me and Me:IsAlive() and not cmd:KeyDown(2) then
+    -- Check if the player is valid and is alive
+    if Me and Me:IsAlive() then
+        -- Check not pressing right click
+        local right_click = IN_ATTACK2
+        if cmd.buttons & right_click ~= 0 then
+            return
+        end
         -- Check if the player is an engineer
         if al.get_player_class(Me) ~= al.TF2_CLASSES.ENGINEER then
             al.printifv("You are not an Engineer")
