@@ -26,7 +26,7 @@ end
 local function spy_call(players)
     -- Loop through all the players
     local time_between_calls = 12
-    local spy_distance = 100
+    local spy_distance = 200
     for _, player in pairs(players) do
         -- Check if the player is an enemy spy and is near.
         -- Make spy call only once every "time_between_calls" seconds
