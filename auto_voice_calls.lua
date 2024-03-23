@@ -12,12 +12,11 @@ config = {
 
 -- Print the name of the script and the verbose setting
 print("Loading " .. config.scriptName .. "...")
-print("Verbose: " .. tostring(config.verbose))
 
 -- Load the required libraries and throw an error if they are not found and exit the script
 local localappdata = os.getenv("LOCALAPPDATA")
-local alex_lib = require(localappdata .. "\\LUAS\\alex_lib")
-if not alex_lib then
+local al = require(localappdata .. "\\LUAS\\alex_lib")
+if not al then
     error("alex_lib not found")
 end
 
@@ -30,12 +29,12 @@ local function spy_call(players)
     for _, player in pairs(players) do
         -- Check if the player is an enemy spy and is near.
         -- Make spy call only once every "time_between_calls" seconds
-        if player:GetTeamNumber() ~= Me:GetTeamNumber() and player:GetPropInt("m_iClass") == alex_lib.TF2_CLASSES.SPY and alex_lib.distance(Me, player) < spy_distance and globals.CurTime() - Last_spy_call_time > time_between_calls and not Call_made then
+        if player:GetTeamNumber() ~= Me:GetTeamNumber() and player:GetPropInt("m_iClass") == al.TF2_CLASSES.SPY and al.distance(Me, player) < spy_distance and globals.CurTime() - Last_spy_call_time > time_between_calls and not Call_made then
             client.Command("voicemenu 1 1", true)
             Last_spy_call_time = globals.CurTime()
             Last_call_type = "Spy"
             Call_made = true
-            alex_lib.printifv("Spy")
+            al.printifv("Spy")
         end
     end
 end
@@ -49,7 +48,7 @@ local function medic_call()
         Last_medic_call_time = globals.CurTime()
         Last_call_type = "Medic"
         Call_made = true
-        alex_lib.printifv("Medic")
+        al.printifv("Medic")
     end
 end
 
@@ -66,7 +65,7 @@ local function onCreateMove()
     if not Me then return end
 
     -- Get all the players
-    local players = alex_lib.getPlayers()
+    local players = al.getPlayers()
 
     -- Spy call
     spy_call(players)

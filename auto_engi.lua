@@ -6,7 +6,6 @@ config = {
     verbose = false
 }
 print("Loading " .. config.scriptName .. "...")
-print("Verbose: " .. tostring(config.verbose))
 
 -- Load the required libraries and throw an error if they are not found and exit the script
 local localappdata = os.getenv("LOCALAPPDATA")
@@ -81,9 +80,14 @@ local function repairBuilding(cmd, building)
 end
 
 local function onCreateMove(cmd)
+    -- Get ticks per second
+    local tickrate = 1 / globals.TickInterval() --66
+
+    -- Get the local player
     Me = entities.GetLocalPlayer()
 
-    if Me then
+    -- Check if the player is valid and is alive and if right click is not pressed
+    if Me and Me:IsAlive() and not cmd:KeyDown(2) then
         -- Check if the player is an engineer
         if al.get_player_class(Me) ~= al.TF2_CLASSES.ENGINEER then
             al.printifv("You are not an Engineer")
