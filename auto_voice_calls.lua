@@ -4,63 +4,68 @@
 -- - "Medic" when low on health
 -- It will use comments to explain the code and the logic behind it
 
--- Define the configuration
-config = {
+
+---@class Script
+local script = {
     scriptName = "Auto Voice Calls",
-    verbose = true
+    verbose = false,
+    printifv = function(self, str)
+        if self.verbose then
+            print(str)
+        end
+    end
 }
 
 -- Print the name of the script and the verbose setting
-print("Loading " .. config.scriptName .. "...")
+print("Loading " .. script.scriptName .. "...")
 
 -- Load the required libraries and throw an error if they are not found and exit the script
-local localappdata = os.getenv("LOCALAPPDATA")
-local al = require(localappdata .. "\\LUAS\\lib\\alex_lib")
-if not al then
-    error("alex_lib not found")
+require ".\\LUAS\\alex_lib"
+-- Check if the library was loaded and throw an error if it wasn't
+if not TF2_CLASSES then
+    error("The library is not loaded. Please load the library first.")
 end
 
----Check if there is a spy near and voice out the message
+
+-- Global variables
+Last_call_time = 0
+Call_made = false
+
+
+---Check if there is any spy nearby and voice out the message
 local function spy_call()
     -- Loop through all the players
     local time_between_calls = 12
     local spy_distance = 300
     for _, Player in pairs(Players) do
         -- Check if the player is an enemy spy and is near.
-        if Player:GetTeamNumber() ~= Me:GetTeamNumber()
-            and Player:GetPropInt("m_iClass") == al.TF2_CLASSES.SPY
-            and al.distance(Me, Player) < spy_distance
+        if Me and Player:GetTeamNumber() ~= Me:GetTeamNumber()
+            and Player:GetPropInt("m_iClass") == TF2_CLASSES.SPY
+            and distance(Me, Player) < spy_distance
             and globals.CurTime() - Last_call_time > time_between_calls
             and not Call_made then
             client.Command("voicemenu 1 1", true)
             Last_call_time = globals.CurTime()
             Call_made = true
-            al.printifv("Spy")
+            script.printifv("Spy")
         end
     end
 end
 
----Make a call to the medic if the player is low on health
+---Check if the player is low on health and voice out the message
 local function medic_call()
-    local time_between_calls = 6
-    if Me:GetHealth() < Me:GetMaxHealth()
+    local time_between_calls = 3
+    if Me:IsAlive() and Me:GetHealth() < Me:GetMaxHealth()
         and globals.CurTime() - Last_call_time > time_between_calls
         and not Call_made then
         client.Command("voicemenu 0 0", true)
-        al.announce(config.scriptName, "Calling for a Medic")
+        announce(script.scriptName, "Calling for a Medic")
         Last_call_time = globals.CurTime()
         Call_made = true
-        al.printifv("Calling for a Medic. Last call time: " ..
-            Last_call_time ..
-            " Current time: " .. globals.CurTime() .. " Difference: " .. globals.CurTime() - Last_call_time)
+        script.printifv("Calling for a Medic")
     end
 end
 
--- Define the function to voice out the message
-Last_call_time = 0
-Call_made = false
-
--- Make a call once every second
 local function onCreateMove()
     -- Reset flags
     Call_made = false
@@ -70,7 +75,7 @@ local function onCreateMove()
     if not Me then return end
 
     -- Get all the players
-    Players = al.getPlayers()
+    Players = getPlayers()
 
     -- Spy call
     spy_call()
@@ -80,7 +85,7 @@ local function onCreateMove()
 end
 
 -- Add a callback to Draw
-callbacks.Unregister("CreateMove", config.scriptName)
-callbacks.Register("CreateMove", config.scriptName, onCreateMove)
+callbacks.Unregister("CreateMove", script.scriptName)
+callbacks.Register("CreateMove", script.scriptName, onCreateMove)
 
-print("Loaded " .. config.scriptName)
+print("Loaded " .. script.scriptName)

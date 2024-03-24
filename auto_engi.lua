@@ -1,18 +1,24 @@
 -- This is a helper script for TF2 Engineer class
 -- It will try to keep any building at reach at full health
 
-config = {
+---@class Script
+local script = {
     scriptName = "Engineer Auto-Fix Buildings",
-    verbose = false
+    verbose = false,
+    printifv = function(self, str)
+        if self.verbose then
+            print(str)
+        end
+    end
 }
-print("Loading " .. config.scriptName .. "...")
+
+print("Loading " .. script.scriptName .. "...")
 
 -- Load the required libraries and throw an error if they are not found and exit the script
-local localappdata = os.getenv("LOCALAPPDATA")
-local al = require(localappdata .. "\\LUAS\\lib\\alex_lib")
-if not al then
-    error("alex_lib not found")
-end
+require ".\\LUAS\\alex_lib"
+-- Check if the library was loaded
+
+
 
 -- Filter for entities whose Class has "Sentry" in it
 local function getSentryguns()
@@ -54,10 +60,10 @@ Engineer_Melee_Weapons_List = {
 local function repairBuilding(cmd, building)
     -- Check if the sentrygun is within melee range
     -- Use the Alex's Library function to get the distance between the player and the building
-    if Me and al.distance(Me, building) <= 105 then
+    if Me and distance(Me, building) <= 105 then
         -- Get equipped weapon
         local weapon = Me:GetPropEntity("m_hActiveWeapon")
-        al.printifv("Equipped weapon: " .. weapon:GetClass())
+        script.printifv("Equipped weapon: " .. weapon:GetClass())
         -- Check if the weapon is in the list of melee weapons
         local weapon_is_melee = false
         for _, melee_weapon in pairs(Engineer_Melee_Weapons_List) do
@@ -68,11 +74,11 @@ local function repairBuilding(cmd, building)
         end
         -- If the weapon is not a melee weapon, skip
         if not weapon_is_melee then
-            al.printifv("Equipped weapon is not a melee weapon")
+            script.printifv("Equipped weapon is not a melee weapon")
             return
         end
         -- Set the view angles to the building
-        local angles = al.positionAngles(Me:GetAbsOrigin(), building:GetAbsOrigin())
+        local angles = positionAngles(Me:GetAbsOrigin(), building:GetAbsOrigin())
         cmd:SetViewAngles(angles:Unpack())
         -- Attack the building
         cmd:SetButtons(cmd:GetButtons() | 1) -- Attack
@@ -94,8 +100,8 @@ local function onCreateMove(cmd)
             return
         end
         -- Check if the player is an engineer
-        if al.get_player_class(Me) ~= al.TF2_CLASSES.ENGINEER then
-            al.printifv("You are not an Engineer")
+        if get_player_class(Me) ~= TF2_CLASSES.ENGINEER then
+            script.printifv("You are not an Engineer")
             return
         end
         Buildings = {}
@@ -113,7 +119,7 @@ local function onCreateMove(cmd)
         for _, teleporter in pairs(teleporters) do
             table.insert(Buildings, teleporter)
         end
-        al.printifv("Found " .. #Buildings .. " buildings")
+        script.printifv("Found " .. #Buildings .. " buildings")
         -- Get local player
         -- Get the player's team
         local friend_team = Me:GetTeamNumber()
@@ -121,11 +127,11 @@ local function onCreateMove(cmd)
         -- Get buildings at reach
         local buildingsAtReach = {}
         for _, building in pairs(Buildings) do
-            if al.distance(Me, building) <= 105 then
+            if distance(Me, building) <= 105 then
                 table.insert(buildingsAtReach, building)
             end
         end
-        al.printifv("Of wich " .. #buildingsAtReach .. " are at reach")
+        script.printifv("Of wich " .. #buildingsAtReach .. " are at reach")
 
         -- Identify the building with the lowest health
         local lowestHealth = 9999
@@ -144,31 +150,31 @@ local function onCreateMove(cmd)
             -- If the building is damaged or needs ammo, or is below level 3, repair it
             local building_health = lowestHealthBuilding:GetHealth()
             local building_max_health = lowestHealthBuilding:GetMaxHealth()
-            al.printifv("Building health: " .. building_health .. "/" .. building_max_health)
+            script.printifv("Building health: " .. building_health .. "/" .. building_max_health)
 
             local building_level = lowestHealthBuilding:GetPropInt("m_iUpgradeLevel")
-            al.printifv("Building level: " .. building_level)
+            script.printifv("Building level: " .. building_level)
 
             -- If is a sentrygun, check ammo
             local building_ammo = 200
             if lowestHealthBuilding:GetClass():find("Sentry") then
                 building_ammo = lowestHealthBuilding:GetPropInt("m_iAmmoShells")
-                al.printifv("Building ammo: " .. building_ammo)
+                script.printifv("Building ammo: " .. building_ammo)
             end
 
             if building_health < building_max_health or building_ammo < 200 or building_level < 3 then
                 -- Skip if the building is being carried or is about to be built
                 if lowestHealthBuilding:GetPropBool("m_bCarried") then
-                    al.printifv("Building is being carried")
+                    script.printifv("Building is being carried")
                 else
                     -- If the building is at max health and ammo, and player has less than 50 metal, skip
                     local ammoTable = Me:GetPropDataTableInt("localdata", "m_iAmmo")
                     local metal = ammoTable[4]
-                    al.printifv("Player metal: " .. metal)
+                    script.printifv("Player metal: " .. metal)
                     if building_health == building_max_health and building_ammo > 100 and metal <= 50 then
-                        al.printifv("Player has less than 50 metal")
+                        script.printifv("Player has less than 50 metal")
                     else
-                        al.printifv("Repairing building " .. lowestHealthBuilding:GetClass())
+                        script.printifv("Repairing building " .. lowestHealthBuilding:GetClass())
                         repairBuilding(cmd, lowestHealthBuilding)
                     end
                 end
@@ -180,4 +186,4 @@ end
 callbacks.Unregister("CreateMove", "Engineer Auto-Fix Buildings")
 callbacks.Register("CreateMove", "Engineer Auto-Fix Buildings", onCreateMove)
 
-print("Loaded " .. config.scriptName)
+print("Loaded " .. script.scriptName)
