@@ -12,13 +12,13 @@ print("Loading " .. config.scriptName .. "...")
 
 -- Load the required libraries and throw an error if they are not found and exit the script
 local localappdata = os.getenv("LOCALAPPDATA")
-local al = require(localappdata .. "\\LUAS\\alex_lib")
+local al = require(localappdata .. "\\LUAS\\lib\\alex_lib")
 if not al then
     error("alex_lib not found")
 end
 
 -- Define a table with functions for each class customization including a default settings function
-classCustomizationFunctions = {
+ClassCustomizationFunctions = {
     default = function()
         al.printifv("Applying Default Global custom settings first...")
     end,
@@ -41,46 +41,48 @@ classCustomizationFunctions = {
         al.printifv("Applying Demoman custom settings...")
         --
     end,
-    [ al.TF2_CLASSES.MEDIC] = function()
+    [al.TF2_CLASSES.MEDIC] = function()
         -- Custom settings for Medic
         al.printifv("Applying Medic custom settings...")
     end,
-    [ al.TF2_CLASSES.HEAVY] = function()
+    [al.TF2_CLASSES.HEAVY] = function()
         -- Custom settings for Heavy
         al.printifv("Applying Heavy custom settings...")
     end,
-    [ al.TF2_CLASSES.PYRO] = function()
+    [al.TF2_CLASSES.PYRO] = function()
         -- Custom settings for Pyro
         al.printifv("Applying Pyro custom settings...")
     end,
-    [ al.TF2_CLASSES.SPY] = function()
+    [al.TF2_CLASSES.SPY] = function()
         -- Custom settings for Spy
         al.printifv("Applying Spy custom settings...")
     end,
-    [ al.TF2_CLASSES.ENGINEER] = function()
+    [al.TF2_CLASSES.ENGINEER] = function()
         -- Custom settings for Engineer
         al.printifv("Applying Engineer custom settings...")
         --
     end,
 }
 
--- Registers the callback for handling game events
-
-callbacks.Register("FireGameEvent", function(event)
+-- Define the function to handle the game event
+---@param event any
+local function onFireGameEvent(event)
     if event:GetName() == "player_spawn" then
         local eventUserId = event:GetInt("userid")
         local localPlayerIndex = client.GetLocalPlayerIndex()
         local playerInfo = client.GetPlayerInfo(localPlayerIndex)
 
         if playerInfo and eventUserId == playerInfo.UserID then
-            local eventTeam = event:GetInt("team")
             local eventClassIndex = event:GetInt("class")
 
-            classCustomizationFunctions.default() -- Apply global default settings first
+            ClassCustomizationFunctions.default() -- Apply global default settings first
 
-            if classCustomizationFunctions[eventClassIndex] then
-                classCustomizationFunctions[eventClassIndex]()
+            if ClassCustomizationFunctions[eventClassIndex] then
+                ClassCustomizationFunctions[eventClassIndex]()
             end
         end
     end
-end)
+end
+
+-- Registers the callback for handling game events
+callbacks.Register("FireGameEvent", onFireGameEvent)

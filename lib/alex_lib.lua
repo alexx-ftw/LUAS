@@ -53,6 +53,7 @@ local function get_player_class(player)
     return player:GetPropInt("m_iClass")
 end
 ---Announce a message in chat
+---@param script_name string
 ---@param msg string
 local function announce(script_name, msg)
     client.ChatPrintf(string.format("\x073475c9[" .. script_name .. "] \x01%s", msg))

@@ -9,7 +9,7 @@ print("Loading " .. config.scriptName .. "...")
 
 -- Load the required libraries and throw an error if they are not found and exit the script
 local localappdata = os.getenv("LOCALAPPDATA")
-local al = require(localappdata .. "\\LUAS\\alex_lib")
+local al = require(localappdata .. "\\LUAS\\lib\\alex_lib")
 if not al then
     error("alex_lib not found")
 end

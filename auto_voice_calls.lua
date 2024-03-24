@@ -15,7 +15,7 @@ print("Loading " .. config.scriptName .. "...")
 
 -- Load the required libraries and throw an error if they are not found and exit the script
 local localappdata = os.getenv("LOCALAPPDATA")
-local al = require(localappdata .. "\\LUAS\\alex_lib")
+local al = require(localappdata .. "\\LUAS\\lib\\alex_lib")
 if not al then
     error("alex_lib not found")
 end
@@ -27,7 +27,11 @@ local function spy_call()
     local spy_distance = 300
     for _, Player in pairs(Players) do
         -- Check if the player is an enemy spy and is near.
-        if Player:GetTeamNumber() ~= Me:GetTeamNumber() and Player:GetPropInt("m_iClass") == al.TF2_CLASSES.SPY and al.distance(Me, Player) < spy_distance and globals.CurTime() - Last_call_time > time_between_calls and not Call_made then
+        if Player:GetTeamNumber() ~= Me:GetTeamNumber()
+            and Player:GetPropInt("m_iClass") == al.TF2_CLASSES.SPY
+            and al.distance(Me, Player) < spy_distance
+            and globals.CurTime() - Last_call_time > time_between_calls
+            and not Call_made then
             client.Command("voicemenu 1 1", true)
             Last_call_time = globals.CurTime()
             Call_made = true
@@ -39,12 +43,16 @@ end
 ---Make a call to the medic if the player is low on health
 local function medic_call()
     local time_between_calls = 6
-    if Me:GetHealth() < Me:GetMaxHealth() and globals.CurTime() - Last_call_time > time_between_calls and not Call_made then
+    if Me:GetHealth() < Me:GetMaxHealth()
+        and globals.CurTime() - Last_call_time > time_between_calls
+        and not Call_made then
         client.Command("voicemenu 0 0", true)
         al.announce(config.scriptName, "Calling for a Medic")
         Last_call_time = globals.CurTime()
         Call_made = true
-        al.printifv("Calling for a Medic")
+        al.printifv("Calling for a Medic. Last call time: " ..
+            Last_call_time ..
+            " Current time: " .. globals.CurTime() .. " Difference: " .. globals.CurTime() - Last_call_time)
     end
 end
 
