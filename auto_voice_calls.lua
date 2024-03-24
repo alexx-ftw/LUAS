@@ -7,7 +7,7 @@
 -- Define the configuration
 config = {
     scriptName = "Auto Voice Calls",
-    verbose = false
+    verbose = true
 }
 
 -- Print the name of the script and the verbose setting
@@ -15,7 +15,7 @@ print("Loading " .. config.scriptName .. "...")
 
 -- Load the required libraries and throw an error if they are not found and exit the script
 local localappdata = os.getenv("LOCALAPPDATA")
-local al = require(localappdata .. "\\LUAS\\alex_lib")
+local al = require(localappdata .. "\\LUAS\\alex_lib.lua")
 if not al then
     error("alex_lib not found")
 end
@@ -43,12 +43,13 @@ end
 
 local function medic_call()
     local time_between_calls = 6
-    if Me:GetHealth() < Me:GetMaxHealth() and not Me:GetPropBool("m_bHealing") and globals.CurTime() - Last_medic_call_time > time_between_calls and not Call_made then
+    if Me:GetHealth() < Me:GetMaxHealth() and globals.CurTime() - Last_medic_call_time > time_between_calls and not Call_made then
         client.Command("voicemenu 0 0", true)
+        al.announce(config.scriptName, "Calling for a Medic")
         Last_medic_call_time = globals.CurTime()
         Last_call_type = "Medic"
         Call_made = true
-        al.printifv("Medic")
+        al.printifv("Calling for a Medic")
     end
 end
 
@@ -59,7 +60,6 @@ Overall_last_call_time = 0
 Call_made = false
 -- Make a call once every second
 local function onCreateMove()
-
     -- Get the local player
     local Me = entities.GetLocalPlayer()
     if not Me then return end

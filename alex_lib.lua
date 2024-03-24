@@ -52,6 +52,11 @@ end
 local function get_player_class(player)
     return player:GetPropInt("m_iClass")
 end
+---Announce a message in chat
+---@param msg string
+local function announce(script_name, msg)
+    client.ChatPrintf(string.format("\x073475c9[" .. script_name .. "] \x01%s", msg))
+end
 
 -- Return the library
 return {
@@ -60,5 +65,6 @@ return {
     positionAngles = positionAngles,
     printifv = printifv,
     getPlayers = getPlayers,
-    get_player_class = get_player_class
+    get_player_class = get_player_class,
+    announce = announce
 }
