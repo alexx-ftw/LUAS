@@ -26,21 +26,19 @@ if not TF2_CLASSES then
     error("The library is not loaded. Please load the library first.")
 end
 
-
 -- Global variables
 Last_call_time = 0
 Call_made = false
-
 
 ---Check if there is any spy nearby and voice out the message
 local function spy_call()
     -- Loop through all the players
     local time_between_calls = 12
-    local spy_distance = 300
+    local spy_distance = 400
     for _, Player in pairs(Players) do
         -- Check if the player is an enemy spy and is near.
         if Me and Player:GetTeamNumber() ~= Me:GetTeamNumber()
-            and Player:GetPropInt("m_iClass") == TF2_CLASSES.SPY
+            and get_player_class(Player) == TF2_CLASSES.SPY
             and distance(Me, Player) < spy_distance
             and globals.CurTime() - Last_call_time > time_between_calls
             and not Call_made then
@@ -54,10 +52,11 @@ end
 
 ---Check if the player is low on health and voice out the message
 local function medic_call()
-    local time_between_calls = 3
-    if Me:IsAlive() and Me:GetHealth() < Me:GetMaxHealth()
+    local time_between_calls = 4
+    if Me and Me:IsAlive() and Me:GetHealth() < Me:GetMaxHealth()
         and globals.CurTime() - Last_call_time > time_between_calls
-        and not Call_made then
+        and not Call_made and not get_player_class(Me) == TF2_CLASSES.Medic
+    then
         client.Command("voicemenu 0 0", true)
         announce(script.scriptName, "Calling for a Medic")
         Last_call_time = globals.CurTime()
@@ -72,7 +71,10 @@ local function onCreateMove()
 
     -- Get the local player
     local Me = entities.GetLocalPlayer()
-    if not Me then return end
+
+    -- Exit early
+    local min_time_between_calls = 1.5
+    if not Me or (globals.CurTime() - Last_call_time < min_time_between_calls) then return end
 
     -- Get all the players
     Players = getPlayers()

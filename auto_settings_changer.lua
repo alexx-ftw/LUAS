@@ -17,6 +17,10 @@ print("Loading " .. script.scriptName .. "...")
 
 -- Load the required libraries and throw an error if they are not found and exit the script
 require ".\\LUAS\\alex_lib"
+-- Check if the library was loaded and throw an error if it wasn't
+if not TF2_CLASSES then
+    error("The library is not loaded. Please load the library first.")
+end
 
 -- Define a table with functions for each class customization including a default settings function
 ClassCustomizationFunctions = {
