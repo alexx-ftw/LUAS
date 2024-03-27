@@ -1,7 +1,7 @@
 -- This is a helper script for TF2 Engineer class
 -- It will try to keep any building at reach at full health
 
----@class Script
+---@class script
 local script = {
     scriptName = "Engineer Auto-Fix Buildings",
     verbose = false,

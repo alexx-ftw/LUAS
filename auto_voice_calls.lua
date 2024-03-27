@@ -5,16 +5,19 @@
 -- It will use comments to explain the code and the logic behind it
 
 
----@class Script
 local script = {
     scriptName = "Auto Voice Calls",
-    verbose = false,
-    printifv = function(self, str)
+    verbose = true,
+    version = "1.0.0",
+    printifv = function(self, message)
         if self.verbose then
-            print(str)
+            print(message)
         end
     end
 }
+
+
+
 
 -- Print the name of the script and the verbose setting
 print("Loading " .. script.scriptName .. "...")
@@ -26,9 +29,12 @@ if not TF2_CLASSES then
     error("The library is not loaded. Please load the library first.")
 end
 
--- Global variables
-Last_call_time = 0
-Call_made = false
+-- Script variables
+local Me = nil
+local Players = {}
+local Last_call_time = 0
+local Min_time_between_calls = 1
+local call_made = false
 
 ---Check if there is any spy nearby and voice out the message
 local function spy_call()
@@ -41,10 +47,10 @@ local function spy_call()
             and get_player_class(Player) == TF2_CLASSES.SPY
             and distance(Me, Player) < spy_distance
             and globals.CurTime() - Last_call_time > time_between_calls
-            and not Call_made then
+            and not call_made then
             client.Command("voicemenu 1 1", true)
             Last_call_time = globals.CurTime()
-            Call_made = true
+            call_made = true
             script.printifv("Spy")
         end
     end
@@ -52,29 +58,32 @@ end
 
 ---Check if the player is low on health and voice out the message
 local function medic_call()
+    script.printifv("Checking for Medic")
     local time_between_calls = 4
-    if Me and Me:IsAlive() and Me:GetHealth() < Me:GetMaxHealth()
+    if Me and Me:GetHealth() < (Me:GetMaxHealth() * 0.9)
         and globals.CurTime() - Last_call_time > time_between_calls
-        and not Call_made and not get_player_class(Me) == TF2_CLASSES.Medic
+        and not call_made and get_player_class(Me) ~= TF2_CLASSES.Medic
     then
         client.Command("voicemenu 0 0", true)
         announce(script.scriptName, "Calling for a Medic")
         Last_call_time = globals.CurTime()
-        Call_made = true
+        call_made = true
         script.printifv("Calling for a Medic")
     end
 end
 
-local function onCreateMove()
+local function onCreateMove(cmd)
     -- Reset flags
-    Call_made = false
+    call_made = false
 
     -- Get the local player
-    local Me = entities.GetLocalPlayer()
+    Me = entities.GetLocalPlayer()
 
     -- Exit early
-    local min_time_between_calls = 1.5
-    if not Me or (globals.CurTime() - Last_call_time < min_time_between_calls) then return end
+    if not Me or not Me:IsAlive() or globals.CurTime() - Last_call_time < Min_time_between_calls then
+        script.printifv("Exiting early")
+        return
+    end
 
     -- Get all the players
     Players = getPlayers()

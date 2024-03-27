@@ -1,7 +1,7 @@
 -- This is a helper script for Team Fortress 2
 -- It will adjust LMAOBox settings based on the class you are playing
 
----@class Script
+---@class script
 local script = {
     scriptName = "Auto Settings Changer",
     verbose = false,
