@@ -5,6 +5,7 @@
 local script = {
     scriptName = "Engineer Auto-Fix Buildings",
     verbose = false,
+    version = "1.0.0",
     printifv = function(self, str)
         if self.verbose then
             print(str)
