@@ -33,7 +33,7 @@ end
 local Me = nil
 local Players = {}
 local Last_call_time = 0
-local Min_time_between_calls = 1
+local Min_time_between_calls = 5
 local call_made = false
 
 ---Check if there is any spy nearby and voice out the message
@@ -59,7 +59,7 @@ end
 ---Check if the player is low on health and voice out the message
 local function medic_call()
     script.printifv("Checking for Medic")
-    local time_between_calls = 4
+    local time_between_calls = 5
     if Me and Me:GetHealth() < (Me:GetMaxHealth() * 0.9)
         and globals.CurTime() - Last_call_time > time_between_calls
         and not call_made and get_player_class(Me) ~= TF2_CLASSES.Medic
